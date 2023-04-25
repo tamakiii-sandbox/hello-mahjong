@@ -30,6 +30,10 @@ impl Game {
     pub fn wall_contains(&self, tile: &Tile) -> bool {
         self.wall.contains(tile)
     }
+
+    pub fn next_turn(&mut self) {
+        self.current_turn = (self.current_turn + 1) % self.players.len()
+    }
 }
 
 fn init_players(num_players: usize) -> Vec<Player> {
