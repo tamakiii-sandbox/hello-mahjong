@@ -7,8 +7,7 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new() -> Self {
-        let wall = generate_wall();
+    pub fn new(wall: Vec<Tile>) -> Self {
         Game { wall }
     }
 
@@ -45,20 +44,27 @@ fn generate_wall() -> Vec<Tile> {
         wall.push(Tile::new(TileType::Dragon(Dragon::White)));
     }
 
-    // // Shuffle the wall
-    // let mut rng = thread_rng();
-    // wall.shuffle(&mut rng);
+    wall
+}
 
+pub fn generate_random_wall() -> Vec<Tile> {
+    let mut wall = generate_wall();
+
+    // Shuffle the wall
+    let mut rng = thread_rng();
+    wall.shuffle(&mut rng);
     wall
 }
 
 #[cfg(test)]
 mod tests {
+    use super::generate_random_wall;
     use super::Game;
 
     #[test]
     fn test_game_new() {
-        let game = Game::new();
+        let wall = generate_random_wall();
+        let game = Game::new(wall);
         assert_eq!(game.wall_size(), 136);
     }
 }

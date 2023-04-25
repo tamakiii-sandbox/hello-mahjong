@@ -1,6 +1,7 @@
-use mahjong::mahjong::game::Game;
+use mahjong::mahjong::game::{generate_random_wall, Game};
 
 fn main() {
-    let game = Game::new();
+    let wall = generate_random_wall();
+    let game = Game::new(wall);
     println!("Game created!");
 }
