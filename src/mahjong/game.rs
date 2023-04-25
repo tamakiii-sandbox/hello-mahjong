@@ -24,6 +24,12 @@ impl Game {
     }
 }
 
+pub fn initialize() -> Game {
+    let wall = generate_random_wall();
+    let game = Game::new(wall);
+    game
+}
+
 fn generate_wall() -> Vec<Tile> {
     // Generate a full Mahjong wall with 144 tiles
     let mut wall = Vec::new();
@@ -59,12 +65,19 @@ pub fn generate_random_wall() -> Vec<Tile> {
 #[cfg(test)]
 mod tests {
     use super::generate_random_wall;
+    use super::initialize;
     use super::Game;
 
     #[test]
     fn test_game_new() {
         let wall = generate_random_wall();
         let game = Game::new(wall);
+        assert_eq!(game.wall_size(), 136);
+    }
+
+    #[test]
+    fn test_initialize() {
+        let game = initialize();
         assert_eq!(game.wall_size(), 136);
     }
 }
