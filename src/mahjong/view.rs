@@ -1,4 +1,7 @@
 use crate::mahjong::tile::{Dragon, Tile, TileType, Wind};
+use crate::mahjong::view_emoji::{
+    BambooEmoji, CharacterEmoji, CircleEmoji, DragonEmoji, WindEmoji,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
@@ -28,12 +31,22 @@ pub enum DragonView {
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct TileView {
     pub tile_type: TileTypeView,
+    pub emoji: String,
 }
 
 impl From<Tile> for TileView {
     fn from(tile: Tile) -> Self {
-        let tile_type = TileTypeView::from(tile.tile_type);
-        TileView { tile_type }
+        let tile_type = TileTypeView::from(tile.tile_type.clone());
+        let emoji = match tile.tile_type {
+            TileType::Bamboo(n) => String::from(BambooEmoji::from_usize(n as usize - 1)),
+            TileType::Character(n) => String::from(CharacterEmoji::from_usize(n as usize - 1)),
+            TileType::Circle(n) => String::from(CircleEmoji::from_usize(n as usize - 1)),
+            TileType::Wind(w) => String::from(WindEmoji::from_usize(WindView::from(w) as usize)),
+            TileType::Dragon(d) => {
+                String::from(DragonEmoji::from_usize(DragonView::from(d) as usize))
+            }
+        };
+        TileView { tile_type, emoji }
     }
 }
 
@@ -78,6 +91,30 @@ mod tests {
     };
     use serde_json::{self, json};
 
+    fn sort_json_keys(json: &str) -> String {
+        let value: serde_json::Value = serde_json::from_str(json).unwrap();
+        let sorted_value = sort_value(value);
+        serde_json::to_string(&sorted_value).unwrap()
+    }
+
+    fn sort_value(value: serde_json::Value) -> serde_json::Value {
+        match value {
+            serde_json::Value::Object(mut map) => {
+                let mut sorted_map = serde_json::Map::new();
+                let keys: Vec<String> = map.keys().cloned().collect();
+                for key in keys {
+                    let v = map.remove(&key).unwrap();
+                    sorted_map.insert(key, sort_value(v));
+                }
+                serde_json::Value::Object(sorted_map)
+            }
+            serde_json::Value::Array(arr) => {
+                serde_json::Value::Array(arr.into_iter().map(sort_value).collect())
+            }
+            _ => value,
+        }
+    }
+
     #[test]
     fn test_from() {
         let mut wall: Vec<Tile> = Vec::new();
@@ -89,12 +126,12 @@ mod tests {
 
         let json = serde_json::to_string(&view).unwrap();
         let expected = json!([
-            {"tile_type": {"Bamboo": 1}},
-            {"tile_type": {"Character": 1}},
-            {"tile_type": {"Circle": 1}}
+            {"tile_type": {"Bamboo": 1}, "emoji": "🀐"},
+            {"tile_type": {"Character": 1}, "emoji": "🀇"},
+            {"tile_type": {"Circle": 1}, "emoji": "🀙"}
         ]);
 
         assert!(true, "Unit tests of views");
-        assert_eq!(json, expected.to_string());
+        assert_eq!(sort_json_keys(&json), sort_json_keys(&expected.to_string()));
     }
 }
