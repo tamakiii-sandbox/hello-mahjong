@@ -1,3 +1,6 @@
+use mahjong::mahjong::game::Game;
+
 fn main() {
-    println!("Hello, world!");
+    let game = Game::new();
+    println!("Game created!");
 }
