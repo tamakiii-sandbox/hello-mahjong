@@ -69,7 +69,22 @@ pub fn initialize(num_players: usize) -> Game {
     let players = init_players(num_players);
     let current_turn = select_starting_player();
 
-    let game = Game::new(wall, discards, players, current_turn);
+    let mut game = Game::new(wall, discards, players, current_turn);
+
+    let initial_hand_size = 13;
+    let mut initial_hands: Vec<Vec<Tile>> =
+        vec![Vec::with_capacity(initial_hand_size); num_players];
+
+    for hand in initial_hands.iter_mut() {
+        for _ in 0..initial_hand_size {
+            let tile = game.draw_tile();
+            hand.push(tile.unwrap());
+        }
+    }
+
+    for (player, hand) in game.players.iter_mut().zip(initial_hands) {
+        player.hand = hand;
+    }
 
     game
 }

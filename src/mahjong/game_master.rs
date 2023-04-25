@@ -1,6 +1,5 @@
 use super::game::Game;
 use super::player::Player;
-use super::tile::Tile;
 
 pub struct GameMaster {
     game: Game,
@@ -15,14 +14,31 @@ impl GameMaster {
         self.game.current_turn = (self.game.current_turn + 1) % self.game.players.len();
     }
 
+    // pub fn draw_tile(&mut self, player: &mut Player) {
+    //     let tile = self.game.draw_tile().unwrap();
+    //     player.draw_tile(tile);
+    // }
+
     pub fn draw_tile(&mut self, player_index: usize) {
         let tile = self.game.draw_tile().unwrap();
         self.game.players[player_index].draw_tile(tile);
     }
 
+    pub fn player_index(&self, player: &Player) -> Option<usize> {
+        self.game.players.iter().position(|p| p.id == player.id)
+    }
+
     pub fn discard_tile(&mut self, player_index: usize, tile_index: usize) {
         let tile = self.game.players[player_index].remove_tile(tile_index);
         self.game.discard_tile(tile.unwrap());
+    }
+
+    pub fn current_player(&self) -> &Player {
+        &self.game.players[self.game.current_turn]
+    }
+
+    pub fn current_turn(&self) -> usize {
+        self.game.current_turn
     }
 }
 
