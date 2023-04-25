@@ -24,7 +24,7 @@ pub enum Dragon {
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Tile {
-    tile_type: TileType,
+    pub tile_type: TileType,
 }
 
 impl Tile {
