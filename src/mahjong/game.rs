@@ -1,7 +1,7 @@
 use crate::mahjong::tile::Tile;
 
 pub struct Game {
-    wall: Vec<Tile>,
+    pub wall: Vec<Tile>,
 }
 
 impl Game {
@@ -9,6 +9,20 @@ impl Game {
     pub fn new() -> Game {
         let wall = Vec::new();
         Game { wall }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Game;
+
+    #[test]
+    fn test_game_initialization() {
+        let game = Game::new();
+        assert!(
+            game.wall.is_empty(),
+            "The wall should be empty when the game is initialized."
+        );
     }
 }
 
