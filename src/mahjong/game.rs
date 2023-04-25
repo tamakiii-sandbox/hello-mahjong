@@ -2,13 +2,21 @@ use crate::mahjong::tile::{Dragon, Tile, TileType, Wind};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
+use super::player::Player;
+
 pub struct Game {
     pub wall: Vec<Tile>,
+    pub players: Vec<Player>,
+    pub current_turn: usize,
 }
 
 impl Game {
-    pub fn new(wall: Vec<Tile>) -> Self {
-        Game { wall }
+    pub fn new(wall: Vec<Tile>, players: Vec<Player>, current_turn: usize) -> Self {
+        Game {
+            wall,
+            players,
+            current_turn,
+        }
     }
 
     pub fn draw_tile(&mut self) -> Option<Tile> {
@@ -24,9 +32,25 @@ impl Game {
     }
 }
 
-pub fn initialize() -> Game {
+fn init_players(num_players: usize) -> Vec<Player> {
+    let mut players = Vec::new();
+    for i in 0..num_players {
+        players.push(Player::new(i));
+    }
+    players
+}
+
+fn select_starting_player() -> usize {
+    0 // You can change this to select a random starting player if desired
+}
+
+pub fn initialize(num_players: usize) -> Game {
     let wall = generate_random_wall();
-    let game = Game::new(wall);
+    let players = init_players(num_players);
+    let current_turn = select_starting_player();
+
+    let game = Game::new(wall, players, current_turn);
+
     game
 }
 
@@ -64,20 +88,11 @@ pub fn generate_random_wall() -> Vec<Tile> {
 
 #[cfg(test)]
 mod tests {
-    use super::generate_random_wall;
     use super::initialize;
-    use super::Game;
-
-    #[test]
-    fn test_game_new() {
-        let wall = generate_random_wall();
-        let game = Game::new(wall);
-        assert_eq!(game.wall_size(), 136);
-    }
 
     #[test]
     fn test_initialize() {
-        let game = initialize();
+        let game = initialize(4);
         assert_eq!(game.wall_size(), 136);
     }
 }
