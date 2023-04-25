@@ -31,7 +31,7 @@ impl Player {
         self.hand.push(tile);
     }
 
-    pub fn dicard_tile(&mut self, index: usize) -> Option<Tile> {
+    pub fn remove_tile(&mut self, index: usize) -> Option<Tile> {
         if index < self.hand.len() {
             let discarded_tile = self.hand.remove(index);
             self.discards.push(discarded_tile.clone());
@@ -78,12 +78,12 @@ mod tests {
     }
 
     #[test]
-    fn test_dicard_tile() {
+    fn test_remove_tile() {
         let mut player = Player::new(1);
         let tile = Tile::new(TileType::Character(2));
 
         player.draw_tile(tile);
-        let actual = player.dicard_tile(0);
+        let actual = player.remove_tile(0);
         assert_eq!(TileType::Character(2), actual.unwrap().tile_type);
     }
 }

@@ -5,15 +5,22 @@ use rand::thread_rng;
 use super::player::Player;
 
 pub struct Game {
-    pub wall: Vec<Tile>,
+    wall: Vec<Tile>,
+    discards: Vec<Tile>,
     pub players: Vec<Player>,
     pub current_turn: usize,
 }
 
 impl Game {
-    pub fn new(wall: Vec<Tile>, players: Vec<Player>, current_turn: usize) -> Self {
+    pub fn new(
+        wall: Vec<Tile>,
+        discards: Vec<Tile>,
+        players: Vec<Player>,
+        current_turn: usize,
+    ) -> Self {
         Game {
             wall,
+            discards,
             players,
             current_turn,
         }
@@ -21,6 +28,14 @@ impl Game {
 
     pub fn draw_tile(&mut self) -> Option<Tile> {
         self.wall.pop()
+    }
+
+    pub fn discard_tile(&mut self, tile: Tile) {
+        self.discards.push(tile);
+    }
+
+    pub fn get_wall(&self) -> Vec<Tile> {
+        self.wall.clone()
     }
 
     pub fn wall_size(&self) -> usize {
@@ -50,10 +65,11 @@ fn select_starting_player() -> usize {
 
 pub fn initialize(num_players: usize) -> Game {
     let wall = generate_random_wall();
+    let discards = Vec::new();
     let players = init_players(num_players);
     let current_turn = select_starting_player();
 
-    let game = Game::new(wall, players, current_turn);
+    let game = Game::new(wall, discards, players, current_turn);
 
     game
 }
