@@ -1,59 +1,80 @@
-// use mahjong::mahjong::{game::initialize, view::TileView};
-// use crate::mahjong::game::{initialize, Game};
-// use crate::mahjong::gamemaster::GameMaster;
-
-use mahjong::mahjong::{game::initialize, game_master::GameMaster, tile::Tile, view::TileView};
+use mahjong::mahjong::{
+    game::initialize, game_master::GameMaster, player::Hand, view::TileView, view_emoji::HandView,
+};
 use std::io::{stdin, stdout, Write};
+
+pub enum Event {
+    DrawTile(usize),           // player_index
+    DiscardTile(usize, usize), // player_index, tile_index
+    CheckForWin(usize),        // player_index
+    Quit,
+}
 
 pub fn run() {
     let game = initialize(4);
     let mut gm = GameMaster::new(game);
 
     loop {
+        let player = gm.current_player();
+        let emojis = hand_to_emoji(&player.hand).join(" ");
+        println!("Player {}'s hand: {:?}", gm.current_turn() + 1, emojis);
+
+        let action = prompt_for_action();
+        let event = match action.as_str() {
+            "d" => {
+                let draw_event = Event::DrawTile(gm.current_turn());
+                handle_event(&mut gm, draw_event);
+                let discard_index = prompt_for_discard_index();
+                Event::DiscardTile(gm.current_turn(), discard_index)
+            }
+            "c" => Event::CheckForWin(gm.current_turn()),
+            "q" => Event::Quit,
+            _ => {
+                println!("Invalid input. Please enter a valid action.");
+                continue;
+            }
+        };
+
         {
-            // Display the current player's hand.
-            let player = gm.current_player();
             let emojis = hand_to_emoji(&player.hand).join(" ");
             println!("Player {}'s hand: {:?}", gm.current_turn() + 1, emojis);
         }
 
-        // Ask the player if they want to draw a tile or check for a winning hand.
-        println!("Choose an action: (d)raw, (c)heck for win, or (q)uit:");
-        let action = read_input().trim().to_lowercase();
-
-        // If the player choose to draw a tile, draw a tile and add it to their hand.
-        if action == "d" {
-            // if gm.game.wall.is_empty() {}
-            // let index = gm.player_index(&player);
-            let index = gm.current_turn();
-            gm.draw_tile(index);
-        } else if action == "c" {
-            println!("Checking for a winning hand is not implemented yet.");
-        } else if action == "q" {
-            println!("Quitting the game.")
-        } else {
-            println!("Invalid input. Please enter a valid action.");
-            continue;
-        }
-
-        {
-            let player = gm.current_player();
-            let emojis = hand_to_emoji(&player.hand).join(" ");
-            println!("Player {}'s hand: {:?}", gm.current_turn() + 1, emojis);
-        }
-
-        // Ask the player to choose a tile to discard
-        println!("Choose a tile to discard (0-based index):");
-        let discard_index = read_input().trim().parse::<usize>().unwrap_or_else(|_| {
-            println!("Invalid index. Using default index 0.");
-            0
-        });
-
-        // Remove the chosen tile from their handand add it to the discard pile.
-        gm.discard_tile(gm.current_turn(), discard_index);
-
-        gm.next_turn();
+        handle_event(&mut gm, event);
     }
+}
+
+fn prompt_for_action() -> String {
+    println!("Choose an action: (d)raw, (c)heck for win, or (q)uit:");
+    read_input().trim().to_lowercase()
+}
+
+fn handle_event(gm: &mut GameMaster, event: Event) {
+    match event {
+        Event::DrawTile(player_index) => {
+            gm.draw_tile(player_index);
+        }
+        Event::DiscardTile(player_index, tile_index) => {
+            gm.discard_tile(player_index, tile_index);
+            gm.next_turn();
+        }
+        Event::CheckForWin(_player_index) => {
+            println!("Checking for a winning hand is not implemented yet.");
+        }
+        Event::Quit => {
+            println!("Quitting the game.");
+            std::process::exit(0);
+        }
+    }
+}
+
+fn prompt_for_discard_index() -> usize {
+    println!("Choose a tile to discard (0-based index):");
+    let discard_index = read_input().trim().parse::<usize>().unwrap_or_else(|_| {
+        println!("Invalid index. Using default index 0.");
+        0
+    });
+    discard_index
 }
 
 fn read_input() -> String {
@@ -64,7 +85,7 @@ fn read_input() -> String {
     input
 }
 
-fn hand_to_emoji(hand: &Vec<Tile>) -> Vec<String> {
+fn hand_to_emoji(hand: &Hand) -> HandView {
     hand.iter()
         .map(|tile| TileView::from(tile.clone()).emoji)
         .collect::<Vec<String>>()

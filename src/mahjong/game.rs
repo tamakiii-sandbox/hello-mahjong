@@ -128,6 +128,14 @@ mod tests {
     #[test]
     fn test_initialize() {
         let game = initialize(4);
-        assert_eq!(game.wall_size(), 136);
+        assert_eq!(4, game.players.len());
+
+        assert_eq!(84, game.wall_size());
+        assert_eq!(13, game.players[0].hand.len());
+        assert_eq!(13, game.players[1].hand.len());
+        assert_eq!(13, game.players[2].hand.len());
+        assert_eq!(13, game.players[3].hand.len());
+
+        assert_eq!(136, game.wall_size() + game.players.len() * 13);
     }
 }

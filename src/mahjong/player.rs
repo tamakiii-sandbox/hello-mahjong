@@ -1,10 +1,11 @@
 use super::tile::Tile;
 
+pub type Hand = Vec<Tile>;
+
 #[derive(Debug, Clone)]
 pub struct Player {
     pub id: usize,
-    pub hand: Vec<Tile>,
-    pub melds: Vec<Meld>,
+    pub hand: Hand,
     pub points: i32,
     pub discards: Vec<Tile>,
 }
@@ -21,7 +22,6 @@ impl Player {
         Player {
             id,
             hand: Vec::new(),
-            melds: Vec::new(),
             points: 0,
             discards: Vec::new(),
         }
