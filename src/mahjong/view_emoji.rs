@@ -1,3 +1,5 @@
+pub type HandView = Vec<String>;
+
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum BambooEmoji {
     One = 0,

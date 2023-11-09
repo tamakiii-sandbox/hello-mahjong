@@ -1,8 +1,5 @@
-use mahjong::mahjong::{game::initialize, view::TileView};
+mod cli;
 
 fn main() {
-    let game = initialize();
-    let view: Vec<TileView> = game.wall.into_iter().map(TileView::from).collect();
-    let json = serde_json::to_string(&view).unwrap();
-    println!("{}", json);
+    cli::run();
 }
